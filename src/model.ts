@@ -39,6 +39,8 @@ export const reviewSchema = z.object({
   stage: z.enum(['Research', 'Awaiting response', 'Adopted', 'Closed']),
   note: z.string().max(10000), evidence: z.union([z.literal(''), z.url().startsWith('https://')]),
   updatedAt: z.iso.datetime()
+}).superRefine((review,ctx)=>{
+  if(review.stage==='Adopted'&&!review.evidence)ctx.addIssue({code:'custom',message:'Adoption requires an HTTPS evidence reference',path:['evidence']});
 });
 export type Review = z.infer<typeof reviewSchema>;
 export interface BudgetOption {

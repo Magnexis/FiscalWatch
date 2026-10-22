@@ -1,1 +1,1 @@
-549abfd8366fb3965add14663b2fabdf48b13ba6d586ff4e5e054d4ea712d91a  FiscalWatch-windows-x64.exe
+131edc452556193baea630393bb027a9d1bad0d5a9197cd7da5d0c36c0253fb4  FiscalWatch-windows-x64.exe

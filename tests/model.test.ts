@@ -31,6 +31,7 @@ test('overlapping policy alternatives are rejected',()=>{
 test('invalid imports and unsafe evidence URLs rejected',()=>{
   assert.equal(snapshotSchema.safeParse({schemaVersion:1,rows:[]}).success,false);
   assert.equal(reviewSchema.safeParse({id:'x',stage:'Adopted',note:'x',evidence:'javascript:alert(1)',updatedAt:new Date().toISOString()}).success,false);
+  assert.equal(reviewSchema.safeParse({id:'x',stage:'Adopted',note:'x',evidence:'',updatedAt:new Date().toISOString()}).success,false);
   assert.equal(csvCell('=HYPERLINK("evil")'),'"\'=HYPERLINK(""evil"")"');
   assert.equal(csvCell('safe'),'"safe"');
 });
