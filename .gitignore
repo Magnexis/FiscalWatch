@@ -1,0 +1,11 @@
+node_modules/
+desktop-dist/
+src-tauri/target/
+src-tauri/gen/
+.openai/state/
+.openai/
+__pycache__/
+*.sqlite*
+*.log
+.env
+private/
