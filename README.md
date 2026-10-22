@@ -24,6 +24,7 @@ npm test
 python -m unittest discover -s tests -p test_*.py
 npm run typecheck
 cargo test --manifest-path src-tauri/Cargo.toml
+cargo test --manifest-path src-tauri/Cargo.toml live_public_connectors -- --ignored --nocapture
 npx tsx scripts/render-reports.ts
 npm run desktop:build
 ```
@@ -40,6 +41,8 @@ npx tsx scripts/render-reports.ts
 ```
 
 The Python refresh utility uses only the standard library. It downloads official public data without API keys. Extracts include the exact query, retrieval time, coverage, hash basis and SHA-256. Native refresh hashes normalized returned JSON; Python refresh hashes raw response bytes. These hashes are provenance aids, not signatures or source authenticity guarantees.
+
+The `live_public_connectors` test is opt-in and makes real requests; ordinary Rust tests remain offline. The initial live test received 1,000 CT records, 100 contracts and 100 grants through the same Rust command used by the desktop refresh button.
 
 CT uses dataset `ajdm-rvz7`, FY2026 and the latest 1,000 payment-distribution rows. USAspending selects the top 100 matching awards per kind with CT place of performance. Award amounts are award-level obligations, not state payments or necessarily obligations incurred within the filter window. Federal and state amounts must not be summed. No random-sample or statewide inference is supported. Multi-page federal ingestion is not implemented.
 

@@ -170,6 +170,22 @@ mod tests {
         assert!(valid_record("../../file", "a", &serde_json::json!({})).is_err());
         assert!(valid_record("reviews", "a", &serde_json::json!({"id":"a","note":"x","stage":"Research","evidence":"javascript:alert(1)"})).is_err());
     }
+    #[test] fn invalid_queries_and_file_urls_are_rejected() {
+        assert!(tauri::async_runtime::block_on(fetch_public_data(FetchRequest{source:"ct".into(),year:1,kind:"contract".into()})).is_err());
+        assert!(open_source("file:///C:/Windows/system.ini".into()).is_err());
+        assert!(open_source("https://user:password@example.com".into()).is_err());
+        assert!(valid_record("reviews","a",&serde_json::json!({"id":"a","note":"x","stage":"Adopted","evidence":""})).is_err());
+    }
+    #[test]
+    #[ignore = "Requires live public network; run explicitly for connector smoke validation"]
+    fn live_public_connectors() {
+        for (source,kind) in [("ct","contract"),("usaspending","contract"),("usaspending","grant")] {
+            let result=tauri::async_runtime::block_on(fetch_public_data(FetchRequest{source:source.into(),year:2026,kind:kind.into()})).unwrap();
+            let rows=if source=="ct" {result.as_array().unwrap()} else {result["results"].as_array().unwrap()};
+            assert!(!rows.is_empty());
+            println!("{source}/{kind}: {} real records received",rows.len());
+        }
+    }
     #[test] fn sqlite_upsert_and_reopen_preserves_review() {
         let path = std::env::temp_dir().join(format!("fiscalwatch-test-{}.db",std::process::id()));
         { let db=connect(&path).unwrap();
