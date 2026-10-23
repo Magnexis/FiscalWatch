@@ -26,7 +26,7 @@ fn connect(path: &std::path::Path) -> Result<Connection, AppError> {
 }
 
 fn valid_record(namespace: &str, id: &str, payload: &Value) -> Result<(), AppError> {
-    if !["reviews", "snapshots"].contains(&namespace) || id.is_empty() || id.len() > 120 {
+    if !["reviews", "snapshots", "registry", "audit"].contains(&namespace) || id.is_empty() || id.len() > 120 {
         return Err(AppError::new("INVALID_INPUT", "Invalid record namespace or ID"));
     }
     if !payload.is_object() || payload.to_string().len() > 10_000_000 {
@@ -42,8 +42,13 @@ fn valid_record(namespace: &str, id: &str, payload: &Value) -> Result<(), AppErr
             || (!evidence.is_empty() && !url::Url::parse(evidence).map(|u| u.scheme() == "https" && u.host_str().is_some()).unwrap_or(false)) {
             return Err(AppError::new("INVALID_INPUT", "Invalid review fields"));
         }
-    } else if !payload.get("rows").map(Value::is_array).unwrap_or(false)
-        || payload.get("schemaVersion").and_then(Value::as_u64) != Some(1) {
+    } else if namespace == "audit" {
+        if payload.get("event").and_then(Value::as_str).unwrap_or("").is_empty()
+            || payload.get("hash").and_then(Value::as_str).map(str::len).unwrap_or(0) != 64 {
+            return Err(AppError::new("INVALID_INPUT", "Invalid audit record"));
+        }
+    } else if namespace == "snapshots" && (!payload.get("rows").map(Value::is_array).unwrap_or(false)
+        || payload.get("schemaVersion").and_then(Value::as_u64) != Some(1)) {
         return Err(AppError::new("INVALID_INPUT", "Invalid snapshot"));
     }
     Ok(())
@@ -61,7 +66,7 @@ fn save_record(store: tauri::State<Store>, namespace: String, id: String, payloa
 
 #[tauri::command]
 fn load_records(store: tauri::State<Store>, namespace: String) -> Result<Vec<Value>, AppError> {
-    if !["reviews", "snapshots"].contains(&namespace.as_str()) {
+    if !["reviews", "snapshots", "registry", "audit"].contains(&namespace.as_str()) {
         return Err(AppError::new("INVALID_INPUT", "Unknown namespace"));
     }
     let db = connect(&store.0)?;
@@ -152,6 +157,24 @@ async fn fetch_public_data(request: FetchRequest) -> Result<Value, AppError> {
     serde_json::from_slice(&bytes).map_err(|e| AppError::new("UPSTREAM_SCHEMA", e.to_string()))
 }
 
+/// Retrieves a bounded, fixed official Treasury FiscalData response. The
+/// renderer cannot supply a URL, credentials, headers, or query fields.
+#[tauri::command]
+async fn fetch_treasury_debt() -> Result<Value, AppError> {
+    let client=reqwest::Client::builder().timeout(Duration::from_secs(30))
+        .redirect(reqwest::redirect::Policy::none()).user_agent("Magnexis-FiscalWatch/0.2")
+        .build().map_err(|e|AppError::new("NETWORK",e.to_string()))?;
+    let response=client.get("https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/debt_to_penny")
+        .query(&[("sort","-record_date"),("page[size]","31"),("format","json")]).send().await
+        .map_err(|e|AppError{code:"NETWORK",message:format!("Treasury FiscalData is unavailable: {e}. Bundled observations remain available."),retryable:true})?
+        .error_for_status().map_err(|e|AppError::new("UPSTREAM_HTTP",e.to_string()))?;
+    let bytes=response.bytes().await.map_err(|e|AppError::new("NETWORK",e.to_string()))?;
+    if bytes.len()>2_000_000 {return Err(AppError::new("RESPONSE_TOO_LARGE","Treasury response exceeds 2 MB"));}
+    let value:Value=serde_json::from_slice(&bytes).map_err(|e|AppError::new("UPSTREAM_SCHEMA",e.to_string()))?;
+    if !value.get("data").map(Value::is_array).unwrap_or(false) {return Err(AppError::new("UPSTREAM_SCHEMA","Treasury response lacks data array"));}
+    Ok(value)
+}
+
 fn main() {
     tauri::Builder::default().setup(|app| {
         let directory = app.path().app_local_data_dir()?;
@@ -159,7 +182,7 @@ fn main() {
         let path = directory.join("fiscalwatch.sqlite3");
         connect(&path).map_err(|e| std::io::Error::other(e.message))?;
         app.manage(Store(path)); Ok(())
-    }).invoke_handler(tauri::generate_handler![save_record,load_records,fetch_public_data,open_source,open_report])
+    }).invoke_handler(tauri::generate_handler![save_record,load_records,fetch_public_data,fetch_treasury_debt,open_source,open_report])
         .run(tauri::generate_context!()).expect("FiscalWatch desktop runtime failed");
 }
 
@@ -185,6 +208,13 @@ mod tests {
             assert!(!rows.is_empty());
             println!("{source}/{kind}: {} real records received",rows.len());
         }
+    }
+    #[test]
+    #[ignore = "Requires live Treasury FiscalData network; run explicitly for connector smoke validation"]
+    fn live_treasury_debt_connector() {
+        let result=tauri::async_runtime::block_on(fetch_treasury_debt()).unwrap();
+        assert!(!result["data"].as_array().unwrap().is_empty());
+        assert!(result["data"][0]["debt_held_public_amt"].is_string());
     }
     #[test] fn sqlite_upsert_and_reopen_preserves_review() {
         let path = std::env::temp_dir().join(format!("fiscalwatch-test-{}.db",std::process::id()));

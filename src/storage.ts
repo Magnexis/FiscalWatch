@@ -1,5 +1,5 @@
 import { invoke, isTauri } from '@tauri-apps/api/core';
-import { reviewSchema, snapshotSchema, type Review, type Snapshot } from './model';
+import { registryEntrySchema, reviewSchema, snapshotSchema, type RegistryEntry, type Review, type Snapshot } from './model';
 import { z } from 'zod';
 
 export const native = isTauri();
@@ -25,6 +25,21 @@ export async function loadSnapshots(): Promise<Snapshot[]> {
 export async function storeSnapshot(snapshot: Snapshot): Promise<void> {
   snapshotSchema.parse(snapshot);
   if (native) await invoke('save_record',{namespace:'snapshots',id:snapshot.dataset,payload:snapshot});
+}
+export async function loadRegistry(): Promise<RegistryEntry[]> {
+  const raw:unknown=native ? await invoke('load_records',{namespace:'registry'}) : JSON.parse(localStorage.getItem('fiscalwatch-registry')??'[]');
+  return z.array(registryEntrySchema).parse(raw);
+}
+export async function saveRegistry(entry:RegistryEntry):Promise<void> {
+  const parsed=registryEntrySchema.parse(entry);
+  if(native) { await invoke('save_record',{namespace:'registry',id:parsed.id,payload:parsed}); return; }
+  const prior=await loadRegistry();localStorage.setItem('fiscalwatch-registry',JSON.stringify([...prior.filter(x=>x.id!==parsed.id),parsed]));
+}
+async function sha256(value:string):Promise<string>{const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value));return [...new Uint8Array(bytes)].map(v=>v.toString(16).padStart(2,'0')).join('');}
+/** A locally stored evidence trail detects simple edits after export; it is not a signature or a multi-user ledger. */
+export async function audit(event:string,details:unknown):Promise<void>{
+  const occurredAt=new Date().toISOString();const hash=await sha256(JSON.stringify({event,details,occurredAt}));
+  if(native) await invoke('save_record',{namespace:'audit',id:`${occurredAt}:${event}`.slice(0,120),payload:{event,details,occurredAt,hash}});
 }
 export function download(name: string, content: string, type='application/json'): void {
   const blob = new Blob([content],{type}); const url=URL.createObjectURL(blob);

@@ -11,3 +11,5 @@ The Pages site is static and has no tracking, user database, forms or backend. O
 Anomalies are not proof of waste or fraud. Validate source documents, request an agency explanation, record uncertainty and use appropriate official reporting channels for credible allegations. Do not publicly identify private individuals from protected data.
 
 Report a software vulnerability through GitHub's private reporting facility if enabled. If unavailable, open a minimal public issue requesting a private contact without publishing exploit data, personal information or secrets. No penetration test or independent security audit is claimed.
+
+Phase 2 adds a fixed Treasury FiscalData command that accepts no renderer-provided URL, credentials, or headers. It preserves the same HTTPS-only, redirect-disabled, bounded-response rules as existing connectors. The threat model is maintained in THREAT-MODEL.md and the dependency inventory in SBOM.md. GitHub Actions verifies code with read-only repository permissions; it does not deploy releases or Pages.

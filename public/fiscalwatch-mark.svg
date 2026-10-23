@@ -1,0 +1,11 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Fiscal Watch logo</title>
+  <desc id="desc">A colorful circular fiscal accountability mark with ascending report bars.</desc>
+  <rect width="512" height="512" rx="128" fill="#101B3D"/>
+  <circle cx="256" cy="256" r="178" stroke="#2ED4D1" stroke-width="28" stroke-dasharray="190 52" transform="rotate(-38 256 256)"/>
+  <path d="M144 336V250C144 239 153 230 164 230H198V336H144Z" fill="#5C7CFF"/>
+  <path d="M211 336V195C211 184 220 175 231 175H265V336H211Z" fill="#2ED4D1"/>
+  <path d="M278 336V139C278 128 287 119 298 119H332C343 119 352 128 352 139V336H278Z" fill="#B9ED61"/>
+  <path d="M125 355H374" stroke="#FF8D6B" stroke-width="24" stroke-linecap="round"/>
+  <circle cx="374" cy="355" r="20" fill="#FF8D6B"/>
+</svg>

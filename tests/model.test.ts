@@ -1,8 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { analyze,cents,csvCell,reviewSchema,snapshotSchema,validatePortfolio,type SpendingRow } from '../src/model';
+import { analyze,cents,csvCell,projectDebt,registryEntrySchema,reviewSchema,scenarioSchema,snapshotSchema,validatePortfolio,workstreamReadiness,type SpendingRow } from '../src/model';
 import { budgetOptions } from '../src/evidence';
+import { buildDebtStrategy } from '../src/strategy';
 
 const row:SpendingRow={id:'a',vendor:'Vendor',vendorId:'UEI-1',agency:'Agency',date:'2026-01-01',amount:'0.10',category:'Supplies',invoice:'i1',kind:'payment',metric:'payment',source:'https://data.ct.gov/',contract:''};
 test('cent-exact sums preserve credits and values beyond Number safe integer',()=>{
@@ -43,4 +44,30 @@ test('all bundled real extracts validate and analyze without key conflicts',()=>
     const data=snapshotSchema.parse(JSON.parse(readFileSync(new URL(`../public/data/${key}.json`,import.meta.url),'utf8')));
     assert.ok(data.rows.length>0);assert.ok(analyze(data.rows).count>0);
   }
+});
+test('debt projection is reproducible and a stronger primary balance lowers debt',()=>{
+  const base={name:'test',years:2,initialDebt:100,initialGdp:100,nominalGdpGrowth:0,interestRate:.05,primaryBalanceShareGdp:0,fiscalAdjustmentShareGdp:0};
+  assert.equal(projectDebt(base).at(-1)?.debt,110.25);
+  assert.ok((projectDebt({...base,primaryBalanceShareGdp:.02}).at(-1)?.debt??Infinity)<110.25);
+  assert.equal(scenarioSchema.safeParse({...base,years:51}).success,false);
+});
+test('registry requires trusted evidence and documented verified methodology',()=>{
+  const base={id:'one',title:'Test',agency:'Agency',status:'Independently verified',potentialEffect:'$0',evidenceUrl:'https://www.gao.gov/',methodologyNote:'Reconciled documents and independent review.',overlapGroup:'one',updatedAt:new Date().toISOString()};
+  assert.equal(registryEntrySchema.safeParse(base).success,true);
+  assert.equal(registryEntrySchema.safeParse({...base,methodologyNote:''}).success,false);
+  assert.equal(registryEntrySchema.safeParse({...base,evidenceUrl:'http://example.com'}).success,false);
+});
+test('work queue reports research readiness without inventing fiscal performance',()=>{
+  const queue=workstreamReadiness({hasSnapshot:true,candidateGroups:2,registryCount:1,hasTreasuryDebt:false});
+  assert.equal(queue[0].level,'Needs fresh source');
+  assert.equal(queue[1].level,'Ready to inspect');
+  assert.match(queue[1].detail,/2 candidate/);
+  assert.equal(queue[2].level,'Needs independent review');
+});
+test('debt strategy turns disclosed assumptions into a research agenda, not a policy score',()=>{
+  const scenario={name:'test',years:2,initialDebt:100,initialGdp:100,nominalGdpGrowth:0,interestRate:.05,primaryBalanceShareGdp:.06,fiscalAdjustmentShareGdp:0};
+  const strategy=buildDebtStrategy(scenario,projectDebt(scenario));
+  assert.equal(strategy.trajectory,'Improving');
+  assert.equal(strategy.actions.length,3);
+  assert.match(strategy.actions[0].detail,/interest-rate/i);
 });

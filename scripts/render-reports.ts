@@ -50,7 +50,7 @@ for(const dir of ['public/reports','docs']){
   mkdirSync(dir,{recursive:true});writeFileSync(`${dir}/report.css`,css);
   writeFileSync(`${dir}/fiscal-impact-report.html`,wrap('Fiscal impact report',impact));
   writeFileSync(`${dir}/policy-brief.html`,wrap('A narrow federal efficiency review',brief));
-  writeFileSync(`${dir}/index.html`,wrap('Magnexis FiscalWatch',home));
+  writeFileSync(`${dir}/index.html`,wrap('Magnexis FiscalWatch',home.replace('</ul><p>The portable build','<li><a href="phase-2.html">Phase 2 platform brief: fiscal intelligence architecture and safeguards</a></li></ul><p>The portable build')));
   writeFileSync(`${dir}/evidence-register.json`,JSON.stringify(opportunities,null,2));
   writeFileSync(`${dir}/pilot-summary.json`,JSON.stringify(extracts.map(e=>({dataset:e.key,query:e.snapshot.query,coverage:e.snapshot.coverage,retrievedAt:e.snapshot.retrievedAt,rawSha256:e.snapshot.rawSha256,hashBasis:e.snapshot.hashBasis,uniqueRows:e.stats.count,netAmount:money(e.stats.total),negativeAmounts:money(e.stats.credits),exactRepeatsExcluded:e.stats.repeated,invoiceCandidateGroups:e.stats.candidates.length,verifiedAnnualSavings:0})),null,2));
 }

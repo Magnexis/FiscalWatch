@@ -102,3 +102,85 @@ export function csvCell(value: unknown): string {
   if (/^[\s]*[=+\-@]/.test(text)) text = `'${text}`;
   return `"${text.replaceAll('"', '""')}"`;
 }
+
+/**
+ * A normalized fiscal observation. Values are USD billions for the US profile
+ * unless a profile explicitly says otherwise. Observations are never silently
+ * mixed with model output.
+ */
+export const fiscalObservationSchema = z.object({
+  year: z.number().int().min(1900).max(2200),
+  debt: z.number().finite().nonnegative(),
+  gdp: z.number().finite().positive(),
+  receipts: z.number().finite().nonnegative(),
+  outlays: z.number().finite().nonnegative(),
+  interest: z.number().finite().nonnegative(),
+  source: z.url().startsWith('https://'),
+  retrievedAt: z.iso.datetime(),
+  definition: z.string().min(1).max(1000),
+  quality: z.enum(['official', 'official-derived'])
+});
+export type FiscalObservation = z.infer<typeof fiscalObservationSchema>;
+
+export const scenarioSchema = z.object({
+  name: z.string().min(1).max(80),
+  years: z.number().int().min(1).max(50),
+  initialDebt: z.number().finite().nonnegative(),
+  initialGdp: z.number().finite().positive(),
+  nominalGdpGrowth: z.number().finite().min(-0.5).max(1),
+  interestRate: z.number().finite().min(-0.1).max(1),
+  primaryBalanceShareGdp: z.number().finite().min(-1).max(1),
+  fiscalAdjustmentShareGdp: z.number().finite().min(-1).max(1)
+});
+export type FiscalScenario = z.infer<typeof scenarioSchema>;
+export interface ScenarioPoint { year: number; debt: number; gdp: number; debtToGdp: number; interest: number; primaryBalance: number; }
+
+/**
+ * Illustrative debt dynamics: D(t+1)=D(t)(1+r)-primary balance+adjustment.
+ * Positive primary balance and fiscal adjustment reduce borrowing. This is a
+ * deterministic accounting illustration, not an official forecast.
+ */
+export function projectDebt(input: FiscalScenario): ScenarioPoint[] {
+  const scenario = scenarioSchema.parse(input);
+  let debt=scenario.initialDebt, gdp=scenario.initialGdp;
+  return Array.from({length:scenario.years+1},(_,i)=>{
+    const primaryBalance=gdp*scenario.primaryBalanceShareGdp;
+    const adjustment=gdp*scenario.fiscalAdjustmentShareGdp;
+    const interest=debt*scenario.interestRate;
+    const point={year:i,debt,gdp,debtToGdp:debt/gdp,interest,primaryBalance};
+    debt=Math.max(0,debt+interest-primaryBalance-adjustment);
+    gdp=gdp*(1+scenario.nominalGdpGrowth);
+    return point;
+  });
+}
+
+export function deficit(observation: FiscalObservation): number { return observation.outlays-observation.receipts; }
+export function debtRatio(observation: FiscalObservation): number { return observation.debt/observation.gdp; }
+
+export type ReadinessLevel = 'Ready to inspect' | 'Needs fresh source' | 'Needs independent review';
+export interface WorkstreamReadiness { level: ReadinessLevel; detail: string; action: string; }
+
+/** Converts evidence state into a transparent work queue, never a performance score. */
+export function workstreamReadiness(input: { hasSnapshot: boolean; candidateGroups: number; registryCount: number; hasTreasuryDebt: boolean; }): WorkstreamReadiness[] {
+  return [
+    input.hasTreasuryDebt
+      ? {level:'Ready to inspect',detail:'A current Treasury debt observation is saved for this session.',action:'Compare the definition and date before citing it.'}
+      : {level:'Needs fresh source',detail:'No current Treasury observation has been retrieved in this session.',action:'Refresh Treasury debt from the command center.'},
+    input.hasSnapshot
+      ? {level: input.candidateGroups > 0 ? 'Ready to inspect' : 'Needs independent review',detail: input.candidateGroups > 0 ? `${input.candidateGroups} candidate invoice groups need document review.` : 'Saved extracts contain no repeat candidates under the current rule.',action:'Open spending intelligence and review provenance before drawing conclusions.'}
+      : {level:'Needs fresh source',detail:'No local spending extract has been saved.',action:'Refresh one bounded official extract.'},
+    input.registryCount > 0
+      ? {level:'Needs independent review',detail:`${input.registryCount} local opportunity record${input.registryCount===1?'':'s'} need source and methodology review.`,action:'Record evidence and a review stage in the opportunity registry.'}
+      : {level:'Needs fresh source',detail:'No local opportunities have been added.',action:'Add a source-backed opportunity record.'}
+  ];
+}
+
+export const registryEntrySchema = z.object({
+  id: z.string().min(1).max(120), title: z.string().min(1).max(500), agency: z.string().min(1).max(500),
+  status: z.enum(['Published', 'Estimated', 'Approved', 'Implemented', 'Independently verified']),
+  potentialEffect: z.string().max(500), evidenceUrl: z.url().startsWith('https://'),
+  methodologyNote: z.string().max(5000), overlapGroup: z.string().max(120), updatedAt: z.iso.datetime()
+}).superRefine((entry,ctx)=>{
+  if(entry.status==='Independently verified' && !entry.methodologyNote.trim()) ctx.addIssue({code:'custom',message:'Independently verified entries require methodological notes.',path:['methodologyNote']});
+});
+export type RegistryEntry = z.infer<typeof registryEntrySchema>;
