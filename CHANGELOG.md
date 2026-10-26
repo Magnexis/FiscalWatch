@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — 2026-10-26 GAO methodology refresh
+
+- Incorporated GAO-26-108932 and GAO-26-108896 into desktop, README and published research sources.
+- Linked the official 2026 Duplication and Cost Savings CSV, while distinguishing the March 2026 bulk snapshot from live report-page statuses.
+- Documented modeled potential benefits and no-overlap rules without reporting them as realized or annual FiscalWatch savings.
+- Added an opt-in local CSV downloader with hash, redirect and shape checks, plus offline tests; no unverified GAO affiliation or download claim.
+
+
 ## 1.3.0 — Government decision workspace
 
 - Added the Fiscal Strategy board: a colorful, assumption-linked debt trajectory chart and a sequenced research agenda for stress testing, evidence review, and disclosure.
