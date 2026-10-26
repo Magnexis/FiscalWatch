@@ -164,6 +164,16 @@ The following official research reports supplement—but do not replace—the fi
 
 See [GAO methodology and overlap/accounting guardrails](GAO-METHODOLOGY.md). Independently verified annual savings remain **$0**. This research is independent of GAO and does not imply its endorsement.
 
+### Optional local GAO status snapshot
+
+The source is a **historical March 2026 snapshot**, not a live GAO-status adapter. For a controlled download with SHA-256 provenance, run:
+
+```powershell
+python scripts/gao_snapshot.py --out .local-data/gao-2026-recommendations.csv
+```
+
+The downloader validates the response format and official HTTPS origin, then stores a local CSV and companion `.csv.metadata.json` with the final URL, retrieval date, headers, row count and SHA-256. It neither changes recommendation statuses nor generates benefit claims. A successful live download is not asserted by this repository update.
+
 ## Research status and limits
 
 - Source confirmation is not independent verification of fiscal impact.
