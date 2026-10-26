@@ -144,7 +144,7 @@ The `live_public_connectors` test is opt-in and makes real requests; ordinary Ru
 
 CT uses dataset `ajdm-rvz7`, FY2026 and the latest 1,000 payment-distribution rows. USAspending selects the top 100 matching awards per kind with CT place of performance. Award amounts are award-level obligations, not state payments or necessarily obligations incurred within the filter window. Federal and state amounts must not be summed. No random-sample or statewide inference is supported. Multi-page federal ingestion is not implemented.
 
-GAO's bulk recommendation CSV returned HTTP 403 during initial acquisition. The curated five-action register links to individual official recommendation pages; it is not a full ingestion of all open GAO actions.
+GAO's bulk recommendation CSV initially returned HTTP 403, but the official 2026 direct CSV source is now documented in [GAO-METHODOLOGY.md](GAO-METHODOLOGY.md). Its bulk recommendation statuses are dated **March 2026**, not live. Individual GAO report pages are preferred for newer statuses. A successful CSV import is not yet claimed; the five-action register remains manually curated.
 
 ## Persistence and privacy
 
@@ -153,6 +153,16 @@ Desktop data lives in the OS local application data directory for `com.magnexis.
 ## Static GitHub Pages
 
 The tracked `docs/` folder is a buildless static site with no analytics, form submission or remote database. Publish the `main` branch `/docs` folder using GitHub Pages settings. No custom workflow, paid hosting, Sites deployment or cloud backend is required. Run the report generator before publishing research changes; copy the verified Windows build and checksum into `docs/downloads/` when updating the binary.
+
+## Additional GAO 2026 reference materials
+
+The following official research reports supplement—but do not replace—the five-action register:
+
+- [GAO-26-108932](https://www.gao.gov/products/gao-26-108932): **$132B–$251B in modeled potential future financial benefits** across the broad GAO open-recommendations portfolio. This is neither annual nor realized savings and cannot be added to other policy estimates.
+- [GAO-26-108896](https://www.gao.gov/products/gao-26-108896): separate congressional open-matters inventory with selected item-level benefit estimates.
+- [GAO recommendations index](https://www.gao.gov/duplication-cost-savings/duplication-cost-savings-recommendations) and [2026 CSV](https://www.gao.gov/assets/2026-05/2026%20Duplication%20and%20Cost%20Savings%20-%20Downloadable%20Spreadsheet.csv): March 2026 status snapshot, requiring report-page re-verification.
+
+See [GAO methodology and overlap/accounting guardrails](GAO-METHODOLOGY.md). Independently verified annual savings remain **$0**. This research is independent of GAO and does not imply its endorsement.
 
 ## Research status and limits
 
