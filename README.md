@@ -6,7 +6,12 @@
 [![License](https://img.shields.io/badge/license-MIT-ff8d6b?style=flat-square)](LICENSE)
 [![Tauri](https://img.shields.io/badge/built%20with-Tauri%202-ffc131?style=flat-square)](https://v2.tauri.app/)
 
-<p align="center"><img src="public/fiscalwatch-mark.svg" width="112" alt="Fiscal Watch logo"></p>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/brand/fiscalwatch-logo-on-dark.svg">
+    <img src="public/fiscalwatch-logo.svg" width="420" alt="Fiscal Watch logo — colorful rising bar and line chart mark with wordmark">
+  </picture>
+</p>
 
 > **Release 1.3.0 — Government decision workspace.** Fiscal Watch turns source availability, scenario assumptions, review signals, and evidence gaps into concrete next actions without presenting a government-quality score or inventing fiscal results.
 

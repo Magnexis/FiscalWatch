@@ -1,11 +1,53 @@
-<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-  <title id="title">Fiscal Watch logo</title>
-  <desc id="desc">A colorful circular fiscal accountability mark with ascending report bars.</desc>
-  <rect width="512" height="512" rx="128" fill="#101B3D"/>
-  <circle cx="256" cy="256" r="178" stroke="#2ED4D1" stroke-width="28" stroke-dasharray="190 52" transform="rotate(-38 256 256)"/>
-  <path d="M144 336V250C144 239 153 230 164 230H198V336H144Z" fill="#5C7CFF"/>
-  <path d="M211 336V195C211 184 220 175 231 175H265V336H211Z" fill="#2ED4D1"/>
-  <path d="M278 336V139C278 128 287 119 298 119H332C343 119 352 128 352 139V336H278Z" fill="#B9ED61"/>
-  <path d="M125 355H374" stroke="#FF8D6B" stroke-width="24" stroke-linecap="round"/>
-  <circle cx="374" cy="355" r="20" fill="#FF8D6B"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="fwTitle fwDesc">
+  <title id="fwTitle">Fiscal Watch mark</title>
+  <desc id="fwDesc">Colorful rounded mark with rising fiscal bars and an ascending line chart.</desc>
+  <defs>
+    <linearGradient id="fwSky" x1="64" y1="48" x2="448" y2="464" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0A2744"/>
+      <stop offset="0.55" stop-color="#102A4A"/>
+      <stop offset="1" stop-color="#0D1F38"/>
+    </linearGradient>
+    <linearGradient id="fwGlow" x1="256" y1="96" x2="256" y2="400" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#24C5BB" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#24C5BB" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="fwLine" x1="108" y1="348" x2="404" y2="132" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFC131"/>
+      <stop offset="0.45" stop-color="#FF8A4C"/>
+      <stop offset="1" stop-color="#FF5C7A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Opaque tile so the mark stays readable on light or dark README backgrounds -->
+  <rect width="512" height="512" rx="118" fill="url(#fwSky)"/>
+  <rect x="36" y="36" width="440" height="440" rx="96" fill="url(#fwGlow)"/>
+
+  <!-- Soft grid suggesting a dashboard panel -->
+  <g opacity="0.18" stroke="#7FD8FF" stroke-width="3">
+    <path d="M96 160H416"/>
+    <path d="M96 224H416"/>
+    <path d="M96 288H416"/>
+    <path d="M96 352H416"/>
+    <path d="M160 112V400"/>
+    <path d="M256 112V400"/>
+    <path d="M352 112V400"/>
+  </g>
+
+  <!-- Rising bar graph -->
+  <rect x="118" y="292" width="52" height="96" rx="14" fill="#4F6EF7"/>
+  <rect x="188" y="236" width="52" height="152" rx="14" fill="#24C5BB"/>
+  <rect x="258" y="188" width="52" height="200" rx="14" fill="#FFC131"/>
+  <rect x="328" y="140" width="52" height="248" rx="14" fill="#FF6B5A"/>
+
+  <!-- Ascending market / fiscal line -->
+  <path d="M108 348 C148 330, 168 300, 198 268 C228 236, 248 214, 278 188 C308 162, 338 148, 404 132"
+        stroke="url(#fwLine)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Data points -->
+  <circle cx="198" cy="268" r="14" fill="#FFFFFF" stroke="#24C5BB" stroke-width="6"/>
+  <circle cx="278" cy="188" r="14" fill="#FFFFFF" stroke="#FFC131" stroke-width="6"/>
+  <circle cx="404" cy="132" r="16" fill="#FF5C7A" stroke="#FFFFFF" stroke-width="7"/>
+
+  <!-- Baseline axis -->
+  <path d="M100 400H412" stroke="#8EE7E0" stroke-width="10" stroke-linecap="round" opacity="0.85"/>
 </svg>
