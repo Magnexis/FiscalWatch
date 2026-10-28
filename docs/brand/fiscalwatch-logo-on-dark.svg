@@ -1,0 +1,52 @@
+<svg width="1280" height="360" viewBox="0 0 1280 360" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="fwDarkTitle fwDarkDesc">
+  <title id="fwDarkTitle">Fiscal Watch logo on dark</title>
+  <desc id="fwDarkDesc">Fiscal Watch light wordmark beside a colorful rising bar-and-line chart mark for dark backgrounds.</desc>
+  <defs>
+    <linearGradient id="fwDarkSky" x1="24" y1="24" x2="296" y2="336" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0A2744"/>
+      <stop offset="0.55" stop-color="#102A4A"/>
+      <stop offset="1" stop-color="#0D1F38"/>
+    </linearGradient>
+    <linearGradient id="fwDarkGlow" x1="160" y1="56" x2="160" y2="280" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#24C5BB" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#24C5BB" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="fwDarkLine" x1="72" y1="248" x2="264" y2="96" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFC131"/>
+      <stop offset="0.45" stop-color="#FF8A4C"/>
+      <stop offset="1" stop-color="#FF5C7A"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(20,20)">
+    <rect width="320" height="320" rx="74" fill="url(#fwDarkSky)"/>
+    <rect x="22" y="22" width="276" height="276" rx="60" fill="url(#fwDarkGlow)"/>
+    <g opacity="0.18" stroke="#7FD8FF" stroke-width="2">
+      <path d="M60 100H260"/>
+      <path d="M60 140H260"/>
+      <path d="M60 180H260"/>
+      <path d="M60 220H260"/>
+      <path d="M100 70V250"/>
+      <path d="M160 70V250"/>
+      <path d="M220 70V250"/>
+    </g>
+    <rect x="74" y="182" width="32" height="60" rx="9" fill="#4F6EF7"/>
+    <rect x="118" y="148" width="32" height="94" rx="9" fill="#24C5BB"/>
+    <rect x="162" y="118" width="32" height="124" rx="9" fill="#FFC131"/>
+    <rect x="206" y="88" width="32" height="154" rx="9" fill="#FF6B5A"/>
+    <path d="M68 218 C92 206, 104 188, 124 168 C144 148, 156 134, 174 118 C192 102, 212 94, 252 84"
+          stroke="url(#fwDarkLine)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="124" cy="168" r="9" fill="#FFFFFF" stroke="#24C5BB" stroke-width="4"/>
+    <circle cx="174" cy="118" r="9" fill="#FFFFFF" stroke="#FFC131" stroke-width="4"/>
+    <circle cx="252" cy="84" r="10" fill="#FF5C7A" stroke="#FFFFFF" stroke-width="4"/>
+    <path d="M62 250H258" stroke="#8EE7E0" stroke-width="7" stroke-linecap="round" opacity="0.85"/>
+  </g>
+
+  <text x="392" y="168" fill="#F4F7FF" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="92" font-weight="700" letter-spacing="-1.5">Fiscal</text>
+  <text x="392" y="278" fill="#F4F7FF" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="92" font-weight="700" letter-spacing="-1.5">Watch</text>
+
+  <rect x="392" y="304" width="78" height="12" rx="6" fill="#4F6EF7"/>
+  <rect x="478" y="304" width="78" height="12" rx="6" fill="#24C5BB"/>
+  <rect x="564" y="304" width="78" height="12" rx="6" fill="#FFC131"/>
+  <rect x="650" y="304" width="78" height="12" rx="6" fill="#FF6B5A"/>
+</svg>
